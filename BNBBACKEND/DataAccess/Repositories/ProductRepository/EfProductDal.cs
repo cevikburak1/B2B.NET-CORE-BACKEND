@@ -37,5 +37,25 @@ namespace DataAccess.Repositories.ProductRepository
             }
                
         }
+        public async Task<List<ProductListDto>> GetList()
+        {
+            using (var context = new SimpleContextDb())
+            {
+       
+                var reslt = from x in context.Products
+                            select new ProductListDto
+                            {
+                                Id = x.Id,
+                                Name = x.Name,
+                               
+                                MainImageUrl = (context.ProductImages.Where(p => p.ProductId == x.Id && p.IsMainImage == true).Count() > 0
+                               ? context.ProductImages.Where(p => p.ProductId == x.Id && p.IsMainImage == true).Select(s => s.ImageURL).FirstOrDefault()
+                               : "")
+                                
+                            };
+                return await reslt.OrderBy(p => p.Name).ToListAsync();
+            }
+
+        }
     }
 }
