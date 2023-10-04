@@ -50,7 +50,7 @@ namespace Business.Repositories.ProductRepository
             return new SuccessResult(ProductMessages.Added);
         }
 
-        [SecuredAspect("admin,product.update")]
+        //[SecuredAspect("admin,product.update")]
         [ValidationAspect(typeof(ProductValidator))]
         [RemoveCacheAspect("IProductService.Get")]
 
@@ -95,12 +95,12 @@ namespace Business.Repositories.ProductRepository
         //[SecuredAspect("admin,product.get")]
         [CacheAspect()]
         [PerformanceAspect()]
-        public async Task<IDataResult<List<Product>>> GetList()
+        public async Task<IDataResult<List<ProductListDto>>> GetList()
         {
-            return new SuccessDataResult<List<Product>>(await _productDal.GetAll());
+            return new SuccessDataResult<List<ProductListDto>>(await _productDal.GetList());
         }
 
-        [SecuredAspect("admin,product.get")]
+        //[SecuredAspect("admin,product.get")]
         public async Task<IDataResult<Product>> GetById(int id)
         {
             return new SuccessDataResult<Product>(await _productDal.Get(p => p.Id == id));
