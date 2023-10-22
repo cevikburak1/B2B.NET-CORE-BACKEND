@@ -19,17 +19,25 @@ using Core.Utilities.Hashing;
 using Business.Repositories.UserRepository;
 using Core.Utilities.Business;
 using Core.Utilities.Security.JWT;
+using DataAccess.Repositories.CustomerRelationShipsRepository;
+using Business.Repositories.CustomerRelationShipsRepository;
+using Business.Repositories.OrderRepository;
 
 namespace Business.Repositories.CustomerRepository
 {
     public class CustomerManager : ICustomerService
     {
         private readonly ICustomerDal _customerDal;
+        private readonly ICustomerRelationShipsService _customerRelationShipsService;
+        private readonly IOrderService _orderService;
         private readonly ITokenHandler _tokenHandler;
 
-        public CustomerManager(ICustomerDal customerDal, ITokenHandler tokenHandler)
+
+        public CustomerManager(ICustomerDal customerDal, ITokenHandler tokenHandler, ICustomerRelationShipsService customerRelationShipsService, IOrderService orderService)
         {
+            _customerRelationShipsService = customerRelationShipsService;
             _customerDal = customerDal;
+            _orderService = orderService;
             _tokenHandler = tokenHandler;
         }
 
@@ -80,9 +88,32 @@ namespace Business.Repositories.CustomerRepository
 
         public async Task<IResult> Delete(Customer customer)
         {
+            IResult result = BusinessRules.Run(await CheckIfCustomerOrderExists(customer.Id));
+            if (result != null)
+            {
+                return result;
+            }
+            var customerRelatishonship =await _customerRelationShipsService.GetByCustomerId(customer.Id);
+            if (customerRelatishonship.Data != null)
+            {
+                await _customerRelationShipsService.Delete(customerRelatishonship.Data);
+            }
             await _customerDal.Delete(customer);
             return new SuccessResult(CustomerMessages.Deleted);
         }
+
+
+        public async Task<IResult> CheckIfCustomerOrderExists(int customerId)
+        {
+            var result = await _orderService.GetListByCustomerId(customerId);
+            if (result.Data.Count > 0)
+            {
+                return new ErrorResult("Sipariþi Bulunan Müþteri Kaydý Silinemez");
+            }
+            return new  SuccessResult();
+        }
+
+
 
         [SecuredAspect()]
         [CacheAspect()]
@@ -114,6 +145,16 @@ namespace Business.Repositories.CustomerRepository
             return new SuccessResult();
         }
 
-     
+        [SecuredAspect()]
+        public async Task<IResult> ChangePasswordByAdmin(CustomerChangePasswordByAdminDto customerDto)
+        {
+            byte[] passwordHash,passwordSalt;
+            HashingHelper.CreatePassword(customerDto.Password,out passwordHash,out passwordSalt);
+            var customer = await _customerDal.Get(x => x.Id == customerDto.Id);
+            customer.PasswordHash = passwordHash;
+            customer.PasswordSalt = passwordSalt;
+            await _customerDal.Update(customer);
+            return new SuccessResult(CustomerMessages.Updated);
+        }
     }
 }

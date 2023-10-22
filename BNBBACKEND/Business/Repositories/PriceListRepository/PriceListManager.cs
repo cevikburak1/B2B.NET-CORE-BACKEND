@@ -60,7 +60,7 @@ namespace Business.Repositories.PriceListRepository
         [PerformanceAspect()]
         public async Task<IDataResult<List<PriceList>>> GetList()
         {
-            return new SuccessDataResult<List<PriceList>>(await _priceListDal.GetAll());
+             return new SuccessDataResult<List<PriceList>>(await _priceListDal.GetAll());
         }
 
         [SecuredAspect()]

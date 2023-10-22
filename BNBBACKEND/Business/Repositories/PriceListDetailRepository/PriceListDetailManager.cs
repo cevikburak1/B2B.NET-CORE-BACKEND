@@ -14,6 +14,8 @@ using Business.Repositories.PriceListDetailRepository.Constants;
 using Core.Utilities.Result.Abstract;
 using Core.Utilities.Result.Concrete;
 using DataAccess.Repositories.PriceListDetailRepository;
+using Entities.Dtos;
+using Core.Utilities.Business;
 
 namespace Business.Repositories.PriceListDetailRepository
 {
@@ -32,8 +34,24 @@ namespace Business.Repositories.PriceListDetailRepository
 
         public async Task<IResult> Add(PriceListDetail priceListDetail)
         {
+            IResult result = BusinessRules.Run(await CheckIfProductExist(priceListDetail));
+            if (result != null)
+            {
+                return result;
+            }
             await _priceListDetailDal.Add(priceListDetail);
             return new SuccessResult(PriceListDetailMessages.Added);
+        }
+
+         public  async Task<IResult> CheckIfProductExist(PriceListDetail priceListDetail)
+        {
+            
+            var result =await _priceListDetailDal.Get(p => p.PriceListId == priceListDetail.PriceListId && p.ProductId == priceListDetail.ProductId);
+            if(result!=null) 
+            {
+                return new ErrorResult("Bu Ürün Daha Önce Eklenmiþ Var Olan ürünü Ekleymessiniz ");
+            }
+            return new SuccessResult();
         }
 
         [SecuredAspect()]
@@ -69,9 +87,17 @@ namespace Business.Repositories.PriceListDetailRepository
             return new SuccessDataResult<PriceListDetail>(await _priceListDetailDal.Get(p => p.Id == id));
         }
 
-        public Task<List<PriceListDetail>> GetListByProductId(int id)
+        public async Task<List<PriceListDetail>> GetListByProductId(int id)
         {
-            return _priceListDetailDal.GetAll(p => p.Id == id);
+            return await _priceListDetailDal.GetAll(p => p.Id == id);
+        }
+
+        [SecuredAspect()]
+        [CacheAspect()]
+        [PerformanceAspect()]
+        public async Task<IDataResult<List<PriceListDetailDto>>> GetListDto(int pricelistId)
+        {
+            return new SuccessDataResult<List<PriceListDetailDto>>(await _priceListDetailDal.GetListDto(pricelistId));
         }
     }
 }

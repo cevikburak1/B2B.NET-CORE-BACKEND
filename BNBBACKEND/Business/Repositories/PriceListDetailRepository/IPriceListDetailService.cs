@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Entities.Concrete;
 using Core.Utilities.Result.Abstract;
+using Entities.Dtos;
 
 namespace Business.Repositories.PriceListDetailRepository
 {
@@ -14,6 +15,8 @@ namespace Business.Repositories.PriceListDetailRepository
         Task<IResult> Update(PriceListDetail priceListDetail);
         Task<IResult> Delete(PriceListDetail priceListDetail);
         Task<IDataResult<List<PriceListDetail>>> GetList();
+
+        Task<IDataResult<List<PriceListDetailDto>>> GetListDto(int pricelistId);
         Task<List<PriceListDetail>> GetListByProductId(int id);
         Task<IDataResult<PriceListDetail>> GetById(int id);
     }

@@ -34,7 +34,7 @@ namespace Business.Repositories.ProductImageRepository
             _fileManager = fileManager;
         }
 
-        //[SecuredAspect()]
+        [SecuredAspect()]
         [ValidationAspect(typeof(ProductImageValidator))]
         [RemoveCacheAspect("IProductImageService.Get")]
 
@@ -50,12 +50,12 @@ namespace Business.Repositories.ProductImageRepository
 
                 if (result == null)
                 {
-                    string filename = _fileManager.FileSaveToServer(image, "Content/img/");
+                    string filename = _fileManager.FileSaveToServer(image, "C:/business-to-business/src/assets/img/");
 
                     ProductImage productImage = new ()
                     {
                         Id = 0,
-                        ImageURL = filename,
+                        ImageUrl = filename,
                         ProductId = productImageAddDto.ProductId,
                         IsMainImage = false
                     };
@@ -66,7 +66,7 @@ namespace Business.Repositories.ProductImageRepository
             return new SuccessResult(ProductImageMessages.Added);
         }
 
-        //[SecuredAspect()]
+        [SecuredAspect()]
         [ValidationAspect(typeof(ProductImageValidator))]
         [RemoveCacheAspect("IProductImageService.Get")]
 
@@ -81,7 +81,7 @@ namespace Business.Repositories.ProductImageRepository
             {
                 return result;
             }
-            string path = @"./Content/img/" + productImageUpdateDto.ImageURL;
+            string path = @"./Content/img/" + productImageUpdateDto.ImageUrl;
             _fileManager.FileDeleteToServer(path);
             try
             {
@@ -100,7 +100,7 @@ namespace Business.Repositories.ProductImageRepository
             ProductImage productImage = new ()
             {
                 Id = productImageUpdateDto.Id,
-                ImageURL = filename,
+                ImageUrl = filename,
                 ProductId = productImageUpdateDto.ProductId,
                 IsMainImage = productImageUpdateDto.IsMainImage
             };
@@ -109,18 +109,19 @@ namespace Business.Repositories.ProductImageRepository
             return new SuccessResult(ProductImageMessages.Updated);
         }
 
-        //[SecuredAspect()]
+        [SecuredAspect()]
         [RemoveCacheAspect("IProductImageService.Get")]
 
         public async Task<IResult> Delete(ProductImage productImage)
         {
-            string path = @"./Content/img/" + productImage.ImageURL;
+            string path = @"C:/business-to-business/src/assets/img/" + productImage.ImageUrl;
             _fileManager.FileDeleteToServer(path);
 
             await _productImageDal.Delete(productImage);
             return new SuccessResult(ProductImageMessages.Deleted);
         }
 
+        [SecuredAspect]
         [CacheAspect()]
         [PerformanceAspect()]
         public async Task<IDataResult<List<ProductImage>>> GetList()
@@ -128,10 +129,12 @@ namespace Business.Repositories.ProductImageRepository
             return new SuccessDataResult<List<ProductImage>>(await _productImageDal.GetAll());
         }
 
-      
-        public async Task<List<ProductImage>> GetListByProductId(int productid)
+        [SecuredAspect]
+        [CacheAspect()]
+        [PerformanceAspect()]
+        public async Task<IDataResult<List<ProductImage>>> GetListByProductId(int productid)
         {
-            return await _productImageDal.GetAll(p=>p.ProductId== productid);
+            return new SuccessDataResult<List<ProductImage>>(await _productImageDal.GetAll(p=>p.ProductId== productid));
         }
 
 
@@ -162,8 +165,10 @@ namespace Business.Repositories.ProductImageRepository
             }
             return new SuccessResult();
         }
-        [TransactionAspect]
-        //[SecuredAspect()]
+        //[TransactionAspect]
+        [SecuredAspect()]
+        [RemoveCacheAspect("IProductImageService.Get")]
+        [RemoveCacheAspect("IProductService.Get")]
         public async Task<IResult> SetMainImage(int id)
         {
             var productImage =await _productImageDal.Get(x => x.Id == id);

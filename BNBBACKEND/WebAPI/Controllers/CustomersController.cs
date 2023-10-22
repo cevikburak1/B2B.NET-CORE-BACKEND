@@ -71,5 +71,18 @@ namespace WebApi.Controllers
             return BadRequest(result.Message);
         }
 
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> ChangePasswordByAdmin(CustomerChangePasswordByAdminDto customerDto)
+        {
+            var result = await _customerService.ChangePasswordByAdmin(customerDto);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result.Message);
+        }
+
+
     }
 }

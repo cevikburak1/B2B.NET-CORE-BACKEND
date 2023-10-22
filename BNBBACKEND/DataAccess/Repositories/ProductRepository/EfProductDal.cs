@@ -29,9 +29,9 @@ namespace DataAccess.Repositories.ProductRepository
                                 ? context.PriceListDetails.Where(x => x.PriceListId == customerrelationship.PriceListId && x.ProductId == x.Id).Select(s => s.Price).FirstOrDefault()
                                 : 0,
                                 MainImageUrl = (context.ProductImages.Where(p => p.ProductId == x.Id && p.IsMainImage == true).Count() > 0
-                               ? context.ProductImages.Where(p => p.ProductId == x.Id && p.IsMainImage == true).Select(s => s.ImageURL).FirstOrDefault()
+                               ? context.ProductImages.Where(p => p.ProductId == x.Id && p.IsMainImage == true).Select(s => s.ImageUrl).FirstOrDefault()
                                : ""),
-                                Images = context.ProductImages.Where(y => y.ProductId == x.Id).Select(s=>s.ImageURL).ToList()
+                                Images = context.ProductImages.Where(y => y.ProductId == x.Id).Select(s=>s.ImageUrl).ToList()
                             };
                 return await reslt.OrderBy(p => p.Name).ToListAsync();
             }
@@ -49,7 +49,7 @@ namespace DataAccess.Repositories.ProductRepository
                                 Name = x.Name,
                                
                                 MainImageUrl = (context.ProductImages.Where(p => p.ProductId == x.Id && p.IsMainImage == true).Count() > 0
-                               ? context.ProductImages.Where(p => p.ProductId == x.Id && p.IsMainImage == true).Select(s => s.ImageURL).FirstOrDefault()
+                               ? context.ProductImages.Where(p => p.ProductId == x.Id && p.IsMainImage == true).Select(s => s.ImageUrl).FirstOrDefault()
                                : "")
                                 
                             };
