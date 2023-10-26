@@ -129,6 +129,13 @@ namespace Business.Repositories.CustomerRepository
             return new SuccessDataResult<Customer>(await _customerDal.Get(p => p.Id == id));
         }
 
+        [SecuredAspect()]
+        public async Task<IDataResult<CustomerDto>> GetDtoById(int id)
+        {
+            return new SuccessDataResult<CustomerDto>(await _customerDal.GetDto(id));
+        }
+
+
         public async Task<Customer> GetByEmail(string email)
         {
             var result = await _customerDal.Get(p => p.Email == email);

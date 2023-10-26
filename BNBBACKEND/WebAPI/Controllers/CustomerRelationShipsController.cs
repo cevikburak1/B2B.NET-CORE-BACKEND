@@ -6,11 +6,11 @@ namespace WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerRelationShipsesController : ControllerBase
+    public class CustomerRelationShipsController : ControllerBase
     {
         private readonly ICustomerRelationShipsService _customerRelationShipsService;
 
-        public CustomerRelationShipsesController(ICustomerRelationShipsService customerRelationShipsService)
+        public CustomerRelationShipsController(ICustomerRelationShipsService customerRelationShipsService)
         {
             _customerRelationShipsService = customerRelationShipsService;
         }

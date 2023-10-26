@@ -27,6 +27,8 @@ namespace DataAccess.Repositories.CustomerRepository
                                  Email = customer.Email,
                                  PasswordHash = customer.PasswordHash,
                                  PasswordSalt = customer.PasswordSalt,
+                                 Discount = (context.CustomerRelationShipses.Where(x => x.CustomerId == customer.Id) != null
+                                 ? context.CustomerRelationShipses.Where(x => x.CustomerId == customer.Id).Select(s => s.Discount).FirstOrDefault() : 0),
 
                                  PrticeListId = (context.CustomerRelationShipses.Where(x => x.CustomerId == customer.Id) != null
                                  ? context.CustomerRelationShipses.Where(x => x.CustomerId == customer.Id).Select(s => s.PriceListId).FirstOrDefault() : 0),
@@ -39,6 +41,35 @@ namespace DataAccess.Repositories.CustomerRepository
                                  
                              };
                 return await result.OrderBy(p => p.Name).ToListAsync();
+            }
+        }
+
+        public async Task<CustomerDto> GetDto(int id)
+        {
+            using (var context = new SimpleContextDb())
+            {
+                var result = from customer in context.Customers.Where(p=>p.Id==id)
+                             select new CustomerDto
+                             {
+                                 Id = customer.Id, 
+                                 Name = customer.Name,
+                                 Email = customer.Email,
+                                 PasswordHash = customer.PasswordHash,
+                                 PasswordSalt = customer.PasswordSalt,
+                                 Discount = (context.CustomerRelationShipses.Where(x => x.CustomerId == customer.Id) != null
+                                 ? context.CustomerRelationShipses.Where(x => x.CustomerId == customer.Id).Select(s => s.Discount).FirstOrDefault() : 0),
+
+                                 PrticeListId = (context.CustomerRelationShipses.Where(x => x.CustomerId == customer.Id) != null
+                                 ? context.CustomerRelationShipses.Where(x => x.CustomerId == customer.Id).Select(s => s.PriceListId).FirstOrDefault() : 0),
+
+                                 PrticeListName = (context.CustomerRelationShipses.Where(x => x.CustomerId == customer.Id) != null
+                                 ? context.PriceLists.Where(p => p.Id == (context.CustomerRelationShipses.Where(x => x.CustomerId == customer.Id).Select(s => s.PriceListId).FirstOrDefault())).Select(s => s.Name).FirstOrDefault()
+
+
+                                 : "")
+
+                             };
+                return await result.FirstOrDefaultAsync();
             }
         }
     }

@@ -39,10 +39,20 @@ namespace Business.Repositories.CustomerRelationShipsRepository
         [SecuredAspect()]
         [ValidationAspect(typeof(CustomerRelationShipsValidator))]
         [RemoveCacheAspect("ICustomerRelationShipsService.Get")]
-
+        [RemoveCacheAspect("ICustomerService.Get")]
         public async Task<IResult> Update(CustomerRelationShips customerRelationShips)
         {
-            await _customerRelationShipsDal.Update(customerRelationShips);
+            var result = await _customerRelationShipsDal.Get(x=>x.CustomerId==customerRelationShips.CustomerId);
+            if (result != null)
+            {
+                customerRelationShips.Id = result.Id;
+                await _customerRelationShipsDal.Update(customerRelationShips);
+            }
+            else
+            {
+                await _customerRelationShipsDal.Add(customerRelationShips);
+            }
+        
             return new SuccessResult(CustomerRelationShipsMessages.Updated);
         }
 
