@@ -118,9 +118,9 @@ namespace Business.Repositories.CustomerRepository
         [SecuredAspect()]
         [CacheAspect()]
         [PerformanceAspect()]
-        public async Task<IDataResult<List<Customer>>> GetList()
+        public async Task<IDataResult<List<CustomerDto>>> GetList()
         {
-            return new SuccessDataResult<List<Customer>>(await _customerDal.GetAll());
+            return new SuccessDataResult<List<CustomerDto>>(await _customerDal.GetListDto());
         }
 
         [SecuredAspect()]
