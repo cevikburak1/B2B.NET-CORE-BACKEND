@@ -127,6 +127,12 @@ namespace Business.Repositories.OrderRepository
             return new SuccessDataResult<List<Order>>(await _orderDal.GetAll(p=>p.CustomerId==customerId));
         }
 
-       
+        [SecuredAspect()]
+        [CacheAspect()]
+        [PerformanceAspect()]
+        public async Task<IDataResult<List<OrderDto>>> GetListDto()
+        {
+            return new SuccessDataResult<List<OrderDto>>(await _orderDal.GetListDto());
+        }
     }
 }
