@@ -134,5 +134,10 @@ namespace Business.Repositories.OrderRepository
         {
             return new SuccessDataResult<List<OrderDto>>(await _orderDal.GetListDto());
         }
+
+        public async Task<IDataResult<OrderDto>> GetByIdDto(int id)
+        {
+            return new SuccessDataResult<OrderDto>(await _orderDal.GetByIdDto(id));
+        }
     }
 }

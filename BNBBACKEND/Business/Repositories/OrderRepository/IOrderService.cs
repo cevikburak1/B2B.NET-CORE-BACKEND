@@ -17,6 +17,8 @@ namespace Business.Repositories.OrderRepository
         Task<IDataResult<List<Order>>> GetList();
 
         Task<IDataResult<List<OrderDto>>> GetListDto();
+
+        Task<IDataResult<OrderDto>> GetByIdDto(int id);
         Task<IDataResult<List<Order>>> GetListByCustomerId(int customerId);
       
         Task<IDataResult<Order>> GetById(int id);

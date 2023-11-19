@@ -14,6 +14,28 @@ namespace DataAccess.Repositories.OrderRepository
 {
     public class EfOrderDal : EfEntityRepositoryBase<Order, SimpleContextDb>, IOrderDal
     {
+        public async Task<OrderDto> GetByIdDto(int id)
+        {
+            using (var context = new SimpleContextDb())
+            {
+                var result = from order in context.Orders.Where(o => o.Id == id)
+                             join customer in context.Customers on order.CustomerId
+                             equals customer.Id
+                             select new OrderDto
+                             {
+                                 Id = order.Id,
+                                 CustomerId = order.CustomerId,
+                                 CustomeName = customer.Name,
+                                 Date = order.Date,
+                                 OrderNumber = order.OrderNumber,
+                                 Status = order.Status,
+                                 Quantity = context.OrderDetails.Where(x => x.OrderId == order.Id).Sum(s => s.Quantity),
+                                 Total = context.OrderDetails.Where(x => x.OrderId == order.Id).Sum(s => s.Price) * context.OrderDetails.Where(x => x.OrderId == order.Id).Sum(s => s.Quantity),
+                             };
+                return await result.FirstOrDefaultAsync();
+            }
+        }
+
         public async Task<List<OrderDto>> GetListDto()
         {
             using (var context = new SimpleContextDb())

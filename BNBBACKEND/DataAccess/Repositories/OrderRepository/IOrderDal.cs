@@ -15,5 +15,7 @@ namespace DataAccess.Repositories.OrderRepository
 
         Task<List<OrderDto>> GetListDto ();
 
+        Task<OrderDto> GetByIdDto(int id);
+
     }
 }
